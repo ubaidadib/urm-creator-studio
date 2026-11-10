@@ -1,0 +1,61 @@
+{
+  "name": {
+    "ar": "دار السَّنا",
+    "en": "Dar Al-Sana Studio"
+  },
+  "primary_language": "bilingual",
+  "visual_style": "modern",
+  "colors": {
+    "primary": "#0B2545",
+    "secondary": "#13315C",
+    "accent": "#38BDF8",
+    "text": "#FFFFFF",
+    "on_accent": "#0B2545"
+  },
+  "fonts": {
+    "arabic_heading": "Cairo",
+    "arabic_body": "Tajawal",
+    "latin_heading": "Inter",
+    "latin_body": "Inter",
+    "custom": []
+  },
+  "personality": [
+    "professional",
+    "creative",
+    "trustworthy"
+  ],
+  "handles": {
+    "instagram": "@daralsana",
+    "tiktok": "",
+    "youtube": "",
+    "snapchat": "",
+    "x": "",
+    "facebook": "",
+    "linkedin": "",
+    "website": "daralsana.example",
+    "whatsapp": ""
+  },
+  "tagline": {
+    "ar": "تصميم يحكي قصتك",
+    "en": "Design that tells your story"
+  },
+  "outro": {
+    "enabled": true,
+    "duration": 3.0,
+    "show_handles": true,
+    "cta": {
+      "ar": "تواصل معنا لمشروعك القادم",
+      "en": "Let's talk about your next project"
+    }
+  },
+  "watermark": {
+    "enabled": true,
+    "position": "top_corner",
+    "opacity": 0.8
+  },
+  "captions": {
+    "style": "brand"
+  },
+  "numerals": "western",
+  "_note": "Fictional example brand for demonstration only."
+}

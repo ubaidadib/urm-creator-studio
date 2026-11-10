@@ -1,0 +1,61 @@
+{
+  "name": {
+    "ar": "مقهى الريحان",
+    "en": "Al Rayhan Cafe"
+  },
+  "primary_language": "ar",
+  "visual_style": "luxury",
+  "colors": {
+    "primary": "#111111",
+    "secondary": "#3A2E1F",
+    "accent": "#C9A227",
+    "text": "#FFFFFF",
+    "on_accent": "#111111"
+  },
+  "fonts": {
+    "arabic_heading": "Amiri",
+    "arabic_body": "Noto Naskh Arabic",
+    "latin_heading": "Inter",
+    "latin_body": "Inter",
+    "custom": []
+  },
+  "personality": [
+    "warm",
+    "authentic",
+    "premium"
+  ],
+  "handles": {
+    "instagram": "@alrayhan.cafe",
+    "tiktok": "",
+    "youtube": "",
+    "snapchat": "",
+    "x": "",
+    "facebook": "",
+    "linkedin": "",
+    "website": "",
+    "whatsapp": ""
+  },
+  "tagline": {
+    "ar": "قهوة مختصة تُحمَّص يوميًا",
+    "en": "Specialty coffee, roasted daily"
+  },
+  "outro": {
+    "enabled": true,
+    "duration": 3.0,
+    "show_handles": true,
+    "cta": {
+      "ar": "زورونا اليوم",
+      "en": "Visit us today"
+    }
+  },
+  "watermark": {
+    "enabled": true,
+    "position": "top_corner",
+    "opacity": 0.85
+  },
+  "captions": {
+    "style": "box"
+  },
+  "numerals": "arabic_indic",
+  "_note": "Fictional example brand for demonstration only."
+}

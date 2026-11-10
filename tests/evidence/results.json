@@ -1,0 +1,305 @@
+{
+  "seconds": 450.5,
+  "results": [
+    {
+      "id": 1,
+      "name": "Device check in Arabic for a beginner",
+      "status": "PASS",
+      "details": "✅ جهازك جاهز لصناعة الفيديو.",
+      "evidence": []
+    },
+    {
+      "id": 2,
+      "name": "Device check in English for a beginner",
+      "status": "PASS",
+      "details": "✅ Your computer is ready to make videos.",
+      "evidence": []
+    },
+    {
+      "id": 3,
+      "name": "Arabic business with Arabic logo (vertical reel, captions, lower third, music)",
+      "status": "PASS",
+      "details": {
+        "qc": "WARN",
+        "checks": {
+          "file_exists": "ok",
+          "resolution": "ok",
+          "duration": "ok",
+          "video_codec": "ok",
+          "audio_track": "ok",
+          "loudness": "ok",
+          "text_not_clipped": "ok",
+          "text_in_safe_area": "ok",
+          "text_overlap": "ok",
+          "text_reading_time": "warn",
+          "numerals_consistent": "ok",
+          "originals_untouched": "ok",
+          "brand_isolation": "ok",
+          "friendly_final_copy": "ok"
+        },
+        "seconds": 46.0
+      },
+      "evidence": [
+        "frames/03_arabic_business.png"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "English creator brand (talking clip, transcription, burned English captions)",
+      "status": "PASS",
+      "details": {
+        "qc": "WARN",
+        "checks": {
+          "file_exists": "ok",
+          "resolution": "ok",
+          "duration": "ok",
+          "video_codec": "ok",
+          "audio_track": "ok",
+          "loudness": "ok",
+          "text_not_clipped": "ok",
+          "text_in_safe_area": "ok",
+          "text_overlap": "ok",
+          "text_reading_time": "warn",
+          "numerals_consistent": "ok",
+          "originals_untouched": "ok",
+          "brand_isolation": "ok"
+        },
+        "transcript": "1\n00:00:00,000 --> 00:00:02,575\nHi everyone, welcome back to the channel.\n\n2\n00:00:02,575 --> 00:00:05,840\nToday I will show you 3\nsimple tips to stay focused.",
+        "flagged": 0
+      },
+      "evidence": [
+        "frames/04_english_creator.png"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Bilingual Arabic-English brand (square post, mixed-direction texts)",
+      "status": "PASS",
+      "details": {
+        "qc": "WARN",
+        "checks": {
+          "file_exists": "ok",
+          "resolution": "ok",
+          "duration": "ok",
+          "video_codec": "ok",
+          "audio_track": "ok",
+          "loudness": "warn",
+          "text_not_clipped": "ok",
+          "text_in_safe_area": "ok",
+          "text_overlap": "ok",
+          "text_reading_time": "warn",
+          "quiet_original_audio": "warn",
+          "numerals_consistent": "ok",
+          "originals_untouched": "ok",
+          "brand_isolation": "ok"
+        }
+      },
+      "evidence": [
+        "frames/05_bilingual_brand.png"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Brand without a logo (typographic wordmark intro/outro, Arabic-Indic numerals)",
+      "status": "PASS",
+      "details": {
+        "qc": "WARN",
+        "checks": {
+          "file_exists": "ok",
+          "resolution": "ok",
+          "duration": "ok",
+          "video_codec": "ok",
+          "audio_track": "ok",
+          "loudness": "ok",
+          "text_not_clipped": "ok",
+          "text_in_safe_area": "ok",
+          "text_overlap": "ok",
+          "text_reading_time": "warn",
+          "numerals_consistent": "ok",
+          "originals_untouched": "ok",
+          "brand_isolation": "ok"
+        }
+      },
+      "evidence": [
+        "frames/06_no_logo.png"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "User without a configured brand (neutral style, no intro/outro, landscape)",
+      "status": "PASS",
+      "details": {
+        "qc": "WARN",
+        "checks": {
+          "file_exists": "ok",
+          "resolution": "ok",
+          "duration": "ok",
+          "video_codec": "ok",
+          "audio_track": "ok",
+          "loudness": "ok",
+          "text_not_clipped": "ok",
+          "text_in_safe_area": "ok",
+          "text_overlap": "ok",
+          "text_reading_time": "warn",
+          "numerals_consistent": "ok",
+          "originals_untouched": "ok",
+          "brand_isolation": "ok"
+        },
+        "roles": [
+          "scene",
+          "scene",
+          "scene"
+        ]
+      },
+      "evidence": [
+        "frames/07_no_brand.png"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Arabic social video (Arabic speech → local transcription → burned Arabic captions)",
+      "status": "PASS",
+      "details": {
+        "qc": "PASS",
+        "checks": {
+          "file_exists": "ok",
+          "resolution": "ok",
+          "duration": "ok",
+          "video_codec": "ok",
+          "audio_track": "ok",
+          "loudness": "ok",
+          "text_not_clipped": "ok",
+          "text_in_safe_area": "ok",
+          "text_overlap": "ok",
+          "text_reading_time": "ok",
+          "numerals_consistent": "ok",
+          "originals_untouched": "ok",
+          "brand_isolation": "ok"
+        },
+        "transcript": "1\n00:00:00,000 --> 00:00:02,620\nمرحبا بكم في مقهى الريحان\n\n2\n00:00:02,620 --> 00:00:07,220\nنقدم لكم تهوى مختصة محمصة يوميا\n\n3\n00:00:07,220 --> 00:00:10,180\nوحلويات طازجة كل صباح\n\n4\n00:00:10,180 --> 00:00:14,400\nزورونا اليوم وأستمتعوا بخصم خاص",
+        "flagged": 0
+      },
+      "evidence": [
+        "frames/08_arabic_social.png"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "English social video (product ad, music, exported vertical + square + landscape)",
+      "status": "PASS",
+      "details": {
+        "vertical": {
+          "qc": "WARN",
+          "checks": {
+            "file_exists": "ok",
+            "resolution": "ok",
+            "duration": "ok",
+            "video_codec": "ok",
+            "audio_track": "ok",
+            "loudness": "ok",
+            "text_not_clipped": "ok",
+            "text_in_safe_area": "ok",
+            "text_overlap": "ok",
+            "text_reading_time": "warn",
+            "numerals_consistent": "ok",
+            "originals_untouched": "ok",
+            "brand_isolation": "ok"
+          }
+        },
+        "square": {
+          "qc": "WARN",
+          "checks": {
+            "file_exists": "ok",
+            "resolution": "ok",
+            "duration": "ok",
+            "video_codec": "ok",
+            "audio_track": "ok",
+            "loudness": "ok",
+            "text_not_clipped": "ok",
+            "text_in_safe_area": "ok",
+            "text_overlap": "ok",
+            "text_reading_time": "warn",
+            "numerals_consistent": "ok",
+            "originals_untouched": "ok",
+            "brand_isolation": "ok"
+          }
+        },
+        "landscape": {
+          "qc": "WARN",
+          "checks": {
+            "file_exists": "ok",
+            "resolution": "ok",
+            "duration": "ok",
+            "video_codec": "ok",
+            "audio_track": "ok",
+            "loudness": "ok",
+            "text_not_clipped": "ok",
+            "text_in_safe_area": "ok",
+            "text_overlap": "ok",
+            "text_reading_time": "warn",
+            "numerals_consistent": "ok",
+            "originals_untouched": "ok",
+            "brand_isolation": "ok"
+          }
+        }
+      },
+      "evidence": [
+        "frames/09_english_social_vertical.png",
+        "frames/09_english_social_square.png",
+        "frames/09_english_social_landscape.png"
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Mixed-language video (English speech, Arabic subtitles burned + .srt/.vtt sidecars)",
+      "status": "PASS",
+      "details": {
+        "qc": "WARN",
+        "checks": {
+          "file_exists": "ok",
+          "resolution": "ok",
+          "duration": "ok",
+          "video_codec": "ok",
+          "audio_track": "ok",
+          "loudness": "ok",
+          "text_not_clipped": "ok",
+          "text_in_safe_area": "ok",
+          "text_overlap": "ok",
+          "text_reading_time": "ok",
+          "numerals_consistent": "ok",
+          "originals_untouched": "ok",
+          "brand_isolation": "ok",
+          "caption_readability": "warn"
+        },
+        "sidecars": true
+      },
+      "evidence": [
+        "frames/10_mixed_arabic_subs.png"
+      ]
+    },
+    {
+      "id": "X1",
+      "name": "Brand-isolation check catches another brand's handle (deliberate leak)",
+      "status": "PASS",
+      "details": {
+        "qc": "FAIL",
+        "brand_isolation": "fail"
+      },
+      "evidence": []
+    },
+    {
+      "id": "X2",
+      "name": "Original media files unchanged after all renders",
+      "status": "PASS",
+      "details": "all 10 fixture files identical (SHA-256)",
+      "evidence": []
+    },
+    {
+      "id": "X3",
+      "name": "No recipient branding leaks into another recipient's project (all renders scanned)",
+      "status": "PASS",
+      "details": "no foreign names, handles or URM ENROLL text found",
+      "evidence": []
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "name": {
+    "ar": "مخبز السنبلة",
+    "en": ""
+  },
+  "primary_language": "ar",
+  "visual_style": "playful",
+  "colors": {
+    "primary": "#7C2D12",
+    "secondary": "#C2410C",
+    "accent": "#FDE68A",
+    "text": "#FFFFFF",
+    "on_accent": "#431407"
+  },
+  "fonts": {
+    "arabic_heading": "Cairo",
+    "arabic_body": "Tajawal",
+    "latin_heading": "Inter",
+    "latin_body": "Inter",
+    "custom": []
+  },
+  "personality": [
+    "homely",
+    "warm"
+  ],
+  "handles": {
+    "instagram": "",
+    "tiktok": "",
+    "youtube": "",
+    "snapchat": "",
+    "x": "",
+    "facebook": "",
+    "linkedin": "",
+    "website": "",
+    "whatsapp": "+966 5X XXX XXXX"
+  },
+  "tagline": {
+    "ar": "خبز طازج كل صباح",
+    "en": ""
+  },
+  "outro": {
+    "enabled": true,
+    "duration": 3.0,
+    "show_handles": false,
+    "cta": {
+      "ar": "اطلبوا عبر واتساب",
+      "en": ""
+    }
+  },
+  "watermark": {
+    "enabled": false
+  },
+  "captions": {
+    "style": "box"
+  },
+  "numerals": "arabic_indic",
+  "_note": "Fictional example brand without a logo."
+}

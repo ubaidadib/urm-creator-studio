@@ -1,0 +1,59 @@
+{
+  "name": {
+    "ar": "",
+    "en": "Sami Makes"
+  },
+  "primary_language": "en",
+  "visual_style": "playful",
+  "colors": {
+    "primary": "#1F1147",
+    "secondary": "#7C3AED",
+    "accent": "#F97316",
+    "text": "#FFFFFF",
+    "on_accent": "#111111"
+  },
+  "fonts": {
+    "arabic_heading": "Cairo",
+    "arabic_body": "Cairo",
+    "latin_heading": "Inter",
+    "latin_body": "Inter",
+    "custom": []
+  },
+  "personality": [
+    "curious",
+    "energetic",
+    "friendly"
+  ],
+  "handles": {
+    "instagram": "@sami.makes",
+    "tiktok": "@samimakes",
+    "youtube": "@SamiMakes",
+    "snapchat": "",
+    "x": "",
+    "facebook": "",
+    "linkedin": "",
+    "website": "",
+    "whatsapp": ""
+  },
+  "tagline": {
+    "ar": "",
+    "en": "Simple tips, made by hand"
+  },
+  "outro": {
+    "enabled": true,
+    "duration": 3.0,
+    "show_handles": true,
+    "cta": {
+      "ar": "",
+      "en": "Follow for more tips"
+    }
+  },
+  "watermark": {
+    "enabled": false
+  },
+  "captions": {
+    "style": "outline"
+  },
+  "numerals": "western",
+  "_note": "Fictional example brand for demonstration only."
+}

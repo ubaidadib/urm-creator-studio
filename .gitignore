@@ -1,0 +1,13 @@
+# build & runtime
+dist/
+__pycache__/
+*.pyc
+.DS_Store
+tests/results/
+# never commit user workspaces, media or secrets
+/URM-Creator-Studio/
+*.env
+.env*
+*.key
+*.pem
+launch/
