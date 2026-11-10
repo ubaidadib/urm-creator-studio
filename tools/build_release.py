@@ -22,7 +22,7 @@ from urmstudio.common import VERSION  # noqa: E402
 
 # Recipient package: only what end users need. Tests, dev tools and internal reports stay in the repository.
 RECIPIENT = ["README.md", "README.ar.md", "LICENSE", "USAGE-TERMS.md", "USAGE-TERMS.ar.md", "CHANGELOG.md",
-             "SECURITY.md", "RELEASE_NOTES.md", "install.sh", "install.ps1", "Install-macOS.command",
+             "SECURITY.md", "RELEASE_NOTES.md", "THIRD_PARTY_NOTICES.md", "install.sh", "install.ps1", "Install-macOS.command",
              "Install-macOS-English.command", "Install-Windows.bat", "Install-Windows-English.bat",
              "skill", "docs", "examples"]
 EXCLUDE_DIRS = {"__pycache__", ".git", "results", "dist", ".DS_Store", "evidence", "onboarding"}

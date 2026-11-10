@@ -118,6 +118,6 @@ Include your operating system, what you asked for, and the message you saw. Secu
 [SECURITY.md](SECURITY.md). Contributions: see [CONTRIBUTING.md](https://github.com/ubaidadib/urm-creator-studio/blob/main/CONTRIBUTING.md).
 
 ## License
-Code: [MIT](LICENSE). Bundled fonts: SIL Open Font License 1.1 (`skill/urm-creator-studio/fonts/*/OFL.txt`).
+Code: [MIT](LICENSE). Bundled fonts: SIL Open Font License 1.1 (see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)).
 Usage terms: [USAGE-TERMS.md](USAGE-TERMS.md) · [USAGE-TERMS.ar.md](USAGE-TERMS.ar.md).
 Claude and Claude Code are products of Anthropic; this project is not affiliated with or endorsed by Anthropic.
