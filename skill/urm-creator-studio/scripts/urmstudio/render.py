@@ -507,7 +507,10 @@ def final_pass(ctx, main, total, global_ovs, out_mp4, audio_cfg, watermark, sfx_
     for j, ov in enumerate(global_ovs):
         st, en = ov["start"], ov["end"]
         if ov.get("static"):
-            args += ["-i", str(ov["png"])]
+            # Loop the still for the whole video. A single-frame input is lost when FFmpeg re-initialises the
+            # filter graph mid-stream (e.g. a hard-cut join of an untagged intro card and bt709 camera footage),
+            # which made burned-in captions disappear in 1.0.0. Same input form as the animated overlays below.
+            args += ["-loop", "1", "-t", "%.3f" % total, "-i", str(ov["png"])]
             fc.append("[%s][%d:v]overlay=0:0:enable='between(t,%.3f,%.3f)'[g%d]" % (cur, n_in, st, en, j))
         else:
             args += ["-loop", "1", "-t", "%.3f" % total, "-i", str(ov["png"])]

@@ -117,7 +117,7 @@ anything.
 
 ### 1️⃣ Download
 
-Download **`URM-Creator-Studio-v1.0.0.zip`** from the
+Download **`URM-Creator-Studio-v1.0.1.zip`** from the
 **[latest release](https://github.com/ubaidadib/urm-creator-studio/releases/latest)** and unzip it.
 The release page also lists the file's SHA-256 checksum.
 
@@ -193,7 +193,7 @@ assumed. 📄 [Arabic typography guide](docs/en/06-arabic-typography.md)
 
 ## ⚖️ Limitations and transparency
 
-Version 1.0.0 is a first public release. We prefer to tell you exactly where it stands:
+Version 1.0.1 is a maintenance update of the first public release. We prefer to tell you exactly where it stands:
 
 | Area | Current status |
 |---|---|

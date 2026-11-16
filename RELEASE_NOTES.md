@@ -1,10 +1,21 @@
-# URM Creator Studio v1.0.0: First Public Release
+# URM Creator Studio v1.0.1: Maintenance Release
 
 **🌐 [English](#english) · [العربية](#arabic)**
 
 <a id="english"></a>
 
 ## English
+
+### What's new in 1.0.1
+- **Fixed:** burned-in subtitles could be missing from the finished video when the plan used hard cuts with
+  a brand intro and normal phone or camera footage. The subtitle files (.srt and .vtt) were always correct.
+  If you made a captioned video with 1.0.0, check it before posting and render it again with 1.0.1.
+- **Safer assistant:** the studio never edits its own engine during your session. It tells you about a
+  problem instead.
+- No new features and no change to your brands, projects or settings. Install over 1.0.0 the usual way;
+  the installer keeps a backup of the previous version.
+
+### About URM Creator Studio
 
 URM Creator Studio is a free, beginner-friendly, **Arabic-first** video studio that runs as a skill inside
 Claude Code. You describe the video you want, in Arabic or English, and it produces a ready-to-post video
@@ -28,7 +39,7 @@ Claude Code with an eligible paid Claude plan (or Anthropic API account) and int
 FFmpeg; Google Chrome or Microsoft Edge. Optional: whisper.cpp.
 
 ### Install
-1. Download `URM-Creator-Studio-v1.0.0.zip` below and unzip it.
+1. Download `URM-Creator-Studio-v1.0.1.zip` below and unzip it.
 2. Mac: double-click `Install-macOS-English.command`. Windows (unverified): `Install-Windows-English.bat`.
    Linux (unverified): `bash install.sh --en`.
 3. Open Claude Code and type: *Hi, I want to make a video*.
@@ -50,10 +61,10 @@ MIT (code), SIL OFL 1.1 (bundled fonts). See `LICENSE` and `USAGE-TERMS.md`.
 
 ### Verify your download
 ```bash
-shasum -a 256 URM-Creator-Studio-v1.0.0.zip   # macOS / Linux
-certutil -hashfile URM-Creator-Studio-v1.0.0.zip SHA256   # Windows
+shasum -a 256 URM-Creator-Studio-v1.0.1.zip   # macOS / Linux
+certutil -hashfile URM-Creator-Studio-v1.0.1.zip SHA256   # Windows
 ```
-Compare with `URM-Creator-Studio-v1.0.0.zip.sha256`.
+Compare with `URM-Creator-Studio-v1.0.1.zip.sha256`.
 
 ---
 
@@ -84,9 +95,17 @@ Compare with `URM-Creator-Studio-v1.0.0.zip.sha256`.
 برنامج Claude Code مع اشتراك مدفوع مناسب في Claude (أو حساب Anthropic API) واتصال بالإنترنت، وبايثون 3.8 أو أحدث،
 وبرنامج FFmpeg، ومتصفح Google Chrome أو Microsoft Edge. واختياريًا: whisper.cpp.
 
+### ما الجديد في 1.0.1
+- **إصلاح:** قد تختفي الترجمة المطبوعة على الفيديو النهائي عندما تكون الخطة بقطعات مباشرة مع مقدّمة الهوية
+  ولقطات هاتف أو كاميرا عادية. ملفات الترجمة (.srt و.vtt) كانت صحيحة دائمًا. إن صنعت فيديو مترجمًا بالإصدار 1.0.0
+  فراجعه قبل النشر، وأعد تصديره بالإصدار 1.0.1.
+- **مساعد أكثر أمانًا:** لا يعدّل الاستوديو محرّكه أثناء جلستك أبدًا، بل يخبرك بالمشكلة.
+- لا ميزات جديدة، ولا تغيير على هوياتك أو مشاريعك أو إعداداتك. ثبّته فوق 1.0.0 بالطريقة المعتادة، والمثبّت يحتفظ
+  بنسخة احتياطية من الإصدار السابق.
+
 ### التثبيت
 
-1. نزّل الملف `URM-Creator-Studio-v1.0.0.zip` من الأسفل، ثم فكّ ضغطه.
+1. نزّل الملف `URM-Creator-Studio-v1.0.1.zip` من الأسفل، ثم فكّ ضغطه.
 2. في ماك: انقر مرتين على `Install-macOS.command`. في ويندوز (لم يُجرَّب بعد): `Install-Windows.bat`.
 3. افتح Claude Code واكتب: «مرحبًا، أريد صنع فيديو».
 

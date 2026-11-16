@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.1 — proposed, not yet released
+Maintenance release. Fixes one defect; no new features.
+- **Fixed: burned-in captions could be missing from the exported video.** With hard cuts (transition "none")
+  plus a brand intro, camera footage tagged bt709 (normal phone video) caused FFmpeg to re-initialise its filter
+  graph partway through the video, and captions fed as a single image frame were dropped. Captions are now fed as a
+  looped still for the whole video, the same way the engine already feeds lower thirds and the watermark.
+  The SRT/VTT caption files were always correct.
+- Added `tests/regression_captions_hardcut.py`, which checks in real frames (pixels, not exit codes) that English and
+  Arabic captions are visible, including the hard-cut + tagged-footage case.
+- Skill rule: the assistant must never edit the installed engine during a user's session; it reports problems
+  instead.
+
 ## 1.0.0 — 2026-11-10
 First public release.
 - Documentation states verified platforms honestly (tested on macOS; Windows/Linux not yet verified).

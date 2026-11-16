@@ -86,6 +86,10 @@ Details: `reference/modes.md`. Save with `studio.py settings --mode beginner|cre
 - **Licences:** use only media, music and fonts the user owns or has a licence for, or the bundled OFL
   fonts. If unsure, ask. Never download music or footage from the internet for the user's video.
 - **Software:** ask before installing anything or changing system settings; explain what and why first.
+- **Engine integrity:** never edit, patch, replace or add files inside `<skill>` (the engine, references,
+  fonts) during a user's session, even to work around a bug. If a render looks wrong, tell the user plainly
+  what is wrong, offer a different plan setting if one avoids it, and suggest reporting the problem at
+  github.com/ubaidadib/urm-creator-studio/issues. Edit only the user's project files (plan, captions).
 - **Publishing:** never post, upload or send videos. The user publishes.
 - **Honesty:** report QC warnings plainly. If something did not work, say so and offer the fix.
 
