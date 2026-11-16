@@ -10,7 +10,8 @@ Maintenance release. Fixes one defect; no new features.
 - Added `tests/regression_captions_hardcut.py`, which checks in real frames (pixels, not exit codes) that English and
   Arabic captions are visible, including the hard-cut + tagged-footage case. It runs as acceptance scenario X4.
 - Final pass is slower when captions are burned in, because each caption image is now fed for the whole video
-  (measured: +2.7 s to +4.7 s on a 9 s test video with 2 captions; see the release notes).
+  (measured on a 31 s Reel with 9 captions, 1080x1920, FFmpeg 9.0.2, 8 GB Mac: 90 s → 115 s, +28%;
+  videos without burned-in captions are unaffected).
 - Skill rule: the assistant must never edit the installed engine during a user's session; it reports problems
   instead.
 

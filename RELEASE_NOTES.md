@@ -14,8 +14,9 @@
   problem instead.
 - No new features and no change to your brands, projects or settings. Install over 1.0.0 the usual way;
   the installer keeps a backup of the previous version.
-- **Trade-off:** exporting a video with burned-in subtitles now takes a little longer (in our tests, a few
-  seconds more for a short clip), because the subtitles are drawn reliably on every frame.
+- **Trade-off:** exporting a video with burned-in subtitles now takes about a quarter longer, because the
+  subtitles are drawn reliably on every frame. In our test, a 31-second Reel with 9 subtitles took 115 s instead
+  of 90 s on a Mac with 8 GB of memory. Videos without burned-in subtitles are not affected.
 
 ### About URM Creator Studio
 
@@ -104,8 +105,9 @@ Compare with `URM-Creator-Studio-v1.0.1.zip.sha256`.
 - **مساعد أكثر أمانًا:** لا يعدّل الاستوديو محرّكه أثناء جلستك أبدًا، بل يخبرك بالمشكلة.
 - لا ميزات جديدة، ولا تغيير على هوياتك أو مشاريعك أو إعداداتك. ثبّته فوق 1.0.0 بالطريقة المعتادة، والمثبّت يحتفظ
   بنسخة احتياطية من الإصدار السابق.
-- **مقابل ذلك:** تصدير فيديو بترجمة مطبوعة صار يستغرق وقتًا أطول قليلًا (في اختباراتنا بضع ثوانٍ إضافية لمقطع قصير)،
-  لأن الترجمة تُرسم الآن بشكل موثوق على كل إطار.
+- **مقابل ذلك:** تصدير فيديو بترجمة مطبوعة صار يستغرق نحو ربع وقت إضافي، لأن الترجمة تُرسم الآن بشكل موثوق على كل
+  إطار. في اختبارنا استغرق ريلز مدته 31 ثانية فيه 9 أسطر ترجمة 115 ثانية بدل 90 ثانية على ماك بذاكرة 8 جيجابايت.
+  الفيديوهات بلا ترجمة مطبوعة لا تتأثر.
 
 ### التثبيت
 
