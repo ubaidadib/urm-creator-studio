@@ -335,6 +335,19 @@ def main():
         R.record("X1", "Brand-isolation check catches another brand's handle (deliberate leak)",
                  "PASS" if caught else "FAIL", {"qc": overall, "brand_isolation": checks.get("brand_isolation")})
 
+    # ---------------------------------------------------------------- X4 burned captions visible in real frames
+    # (1.0.0 defect: hard cuts + brand intro + bt709-tagged footage made burned captions disappear)
+    if want("x4"):
+        x4_out = R.out / "x4_caption_visibility"
+        cp = subprocess.run([sys.executable, str(ROOT / "tests" / "regression_captions_hardcut.py"),
+                             "--fixtures", str(fx), "--out", str(x4_out), "--skill", str(R.skill)],
+                            capture_output=True, text=True)
+        x4 = json.loads((x4_out / "RESULTS.json").read_text(encoding="utf-8")) if (x4_out / "RESULTS.json").exists() else {}
+        R.record("X4", "Burned-in EN + AR captions visible in rendered frames (incl. hard cuts + intro + bt709 footage)",
+                 "PASS" if cp.returncode == 0 and x4.get("passed") == x4.get("total") and x4.get("total") else "FAIL",
+                 {r["case"]: r["status"] for r in x4.get("results", [])} or cp.stderr[-500:],
+                 [str((x4_out / "RESULTS.md").relative_to(R.out))] if (x4_out / "RESULTS.md").exists() else [])
+
     # ---------------------------------------------------------------- X2 originals untouched
     after = {p.name: sha(p) for p in fx.iterdir() if p.is_file()}
     changed = [k for k in originals if originals[k] != after.get(k)]

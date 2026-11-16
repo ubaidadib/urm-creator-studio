@@ -32,6 +32,7 @@ Results: `<out>/RESULTS.md`, `<out>/results.json`, and `<out>/frames/*.png`, one
 | X1 | Negative test: QC must FAIL when another brand's handle appears in a video |
 | X2 | Original media byte-identical (SHA-256) after all renders |
 | X3 | Every render scanned for other recipients' names and handles and for URM ENROLL text |
+| X4 | Burned-in English and Arabic captions are **visible in rendered frames** (pixel check, not exit codes), including hard cuts + brand intro + bt709-tagged footage, the case that dropped captions in 1.0.0. Runs `tests/regression_captions_hardcut.py`, which can also be run on its own |
 
 Beginner onboarding conversations (scenarios 1 and 2 in full) were tested as simulated sessions: an agent
 followed the skill exactly against a scripted persona and ran the real engine. Reports are in `onboarding/`.

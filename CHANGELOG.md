@@ -8,7 +8,9 @@ Maintenance release. Fixes one defect; no new features.
   looped still for the whole video, the same way the engine already feeds lower thirds and the watermark.
   The SRT/VTT caption files were always correct.
 - Added `tests/regression_captions_hardcut.py`, which checks in real frames (pixels, not exit codes) that English and
-  Arabic captions are visible, including the hard-cut + tagged-footage case.
+  Arabic captions are visible, including the hard-cut + tagged-footage case. It runs as acceptance scenario X4.
+- Final pass is slower when captions are burned in, because each caption image is now fed for the whole video
+  (measured: +2.7 s to +4.7 s on a 9 s test video with 2 captions; see the release notes).
 - Skill rule: the assistant must never edit the installed engine during a user's session; it reports problems
   instead.
 
