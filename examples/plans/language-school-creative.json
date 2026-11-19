@@ -1,0 +1,134 @@
+{
+  "title": "Language School Promo",
+  "brand": null,
+  "format": "vertical",
+  "language": "en",
+  "fps": 30,
+  "production": {
+    "mode": "creative",
+    "concept": "Your world, in a new language: from first words to new opportunities"
+  },
+  "look": "academy",
+  "identity": {
+    "name": "Horizon Language Academy"
+  },
+  "scenes": [
+    {
+      "kind": "motion",
+      "template": "kinetic_title",
+      "duration": 4.2,
+      "params": {
+        "kicker": "Study abroad",
+        "title": "Where will your next language take you?",
+        "highlight": "next"
+      }
+    },
+    {
+      "kind": "motion",
+      "template": "word_cloud",
+      "duration": 3.8,
+      "params": {
+        "title": "Speak to the world",
+        "highlight": "world",
+        "subtitle": "Every conversation opens a door",
+        "words": [
+          "Hello",
+          "مرحبا",
+          "Hola",
+          "Bonjour",
+          "Ciao",
+          "Hallo",
+          "Olá",
+          "Привет",
+          "Merhaba",
+          "Γεια σας",
+          "Salut",
+          "Hej"
+        ]
+      }
+    },
+    {
+      "kind": "motion",
+      "template": "globe",
+      "duration": 4.0,
+      "params": {
+        "title": "One classroom, the whole world",
+        "subtitle": "Learn with students from everywhere"
+      }
+    },
+    {
+      "kind": "motion",
+      "template": "features",
+      "duration": 4.6,
+      "params": {
+        "title": "Learning you can trust",
+        "highlight": "trust",
+        "items": [
+          {
+            "icon": "cap",
+            "title": "Expert teachers",
+            "text": "Qualified and supportive"
+          },
+          {
+            "icon": "users",
+            "title": "Small classes",
+            "text": "More time to speak"
+          },
+          {
+            "icon": "award",
+            "title": "Recognised certificates",
+            "text": "Proof of your progress"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "motion",
+      "template": "journey",
+      "duration": 4.4,
+      "params": {
+        "title": "From first words to fluency",
+        "highlight": "fluency",
+        "steps": [
+          "A1",
+          "A2",
+          "B1",
+          "B2",
+          "C1",
+          "C2"
+        ]
+      }
+    },
+    {
+      "kind": "motion",
+      "template": "contrast",
+      "duration": 5.0,
+      "params": {
+        "from": "A new language",
+        "to": "A world of opportunity",
+        "highlight": "opportunity"
+      }
+    },
+    {
+      "kind": "motion",
+      "template": "cta",
+      "duration": 4.0,
+      "params": {
+        "title": "New courses start every month",
+        "button": "Book your free trial",
+        "sub": "horizon-academy.example"
+      }
+    }
+  ],
+  "audio": {
+    "score": {
+      "mood": "inspiring"
+    },
+    "normalize": true,
+    "target_lufs": -14
+  },
+  "branding": {
+    "intro": false,
+    "outro": false
+  }
+}

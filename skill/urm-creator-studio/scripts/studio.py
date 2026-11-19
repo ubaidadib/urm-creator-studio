@@ -21,6 +21,9 @@ Every command accepts --lang ar|en for its messages and --json for machine outpu
   open inbox|home|latest --project P|PATH [--reveal]   show a folder/video to the user
   brand style SLUG luxury · brand colors SLUG [--apply]  re-apply a style / read colours from the logo
   voiceover TEXTFILE OUT.wav --language ar --approved
+  looks                          visual looks for creative-led videos (no brand assets needed)
+  templates                      motion-design scene templates, icons and transitions
+  asset register PROJECT FILE --origin user|ai-generated|stock|engine [--provider P --license L --prompt T]
 """
 import argparse
 import json
@@ -221,12 +224,38 @@ def cmd_render(a, lang):
     data = {"version_dir": str(vdir), "video": meta["output"], "duration": meta["duration"],
             "qc": rep["overall"], "qc_report": str(vdir / "QC_REPORT.md"),
             "inspect_frames": rep["text_frames_sheet"], "overview": rep["overview"],
-            "seconds_taken": meta["seconds_taken"]}
+            "cover": rep.get("cover"), "manifest": str(vdir / "production.json"),
+            "production_mode": (meta.get("production") or {}).get("mode"),
+            "checks": {c["check"]: c["status"] for c in rep["checks"]},
+            "friendly_copy": meta.get("friendly_copy"), "seconds_taken": meta["seconds_taken"]}
     txt = say(lang, "🎉 الفيديو جاهز: %s\n⏱ المدة: %s\n🔍 الفحص: %s\n🖼 صور للمراجعة: %s",
               "🎉 Video ready: %s\n⏱ Length: %s\n🔍 Check: %s\n🖼 Frames to review: %s") % (
         meta["output"], fmt_time(meta["duration"]), rep["overall"], rep["text_frames_sheet"])
     emit(a, data, txt)
     return 0 if rep["overall"] != "FAIL" else 3
+
+
+def cmd_looks(a, lang):
+    from urmstudio.looks import LOOKS
+    rows = [{"name": k, "label": v["label"][0 if lang == "ar" else 1], "for": v["for"], "mood": v["mood"],
+             "colors": [v["palette"][c] for c in ("bg", "primary", "secondary", "accent")]} for k, v in LOOKS.items()]
+    emit(a, rows, "\n".join("• %s — %s (%s)" % (r["name"], r["label"], r["for"]) for r in rows))
+    return 0
+
+
+def cmd_templates(a, lang):
+    from urmstudio.motion import TEMPLATES, ICON_NAMES, TRANSITIONS
+    data = {"templates": {k: {"use": v[0], "required": list(v[1])} for k, v in TEMPLATES.items()},
+            "icons": ICON_NAMES, "transitions": list(TRANSITIONS),
+            "score_moods": ["inspiring", "corporate", "energetic", "calm", "luxury", "playful"]}
+    emit(a, data, "\n".join("• %s — %s" % (k, v[0]) for k, v in TEMPLATES.items()))
+    return 0
+
+
+def cmd_asset(a, lang):
+    rec = P.register_asset(a.project, a.file, a.origin, a.provider, a.license, a.prompt, a.credit, a.url)
+    emit(a, rec, say(lang, "✅ سُجّل مصدر الملف", "✅ Asset origin recorded") + ": %s (%s)" % (a.file, a.origin))
+    return 0
 
 
 def cmd_qc(a, lang):
@@ -314,7 +343,17 @@ def cmd_voiceover(a, lang):
     return 0
 
 
+def _on_terminate(signum, frame):
+    # treat "stop" like Ctrl-C so temporary folders and helper browsers are always cleaned up
+    raise SystemExit(128 + signum)
+
+
 def main(argv=None):
+    import signal
+    try:
+        signal.signal(signal.SIGTERM, _on_terminate)
+    except (ValueError, AttributeError):
+        pass
     ap = argparse.ArgumentParser(prog="studio", description="URM Creator Studio")
     ap.add_argument("--lang", choices=["ar", "en"])
     ap.add_argument("--json", action="store_true")
@@ -390,6 +429,19 @@ def main(argv=None):
     s.add_argument("--project")
     s.add_argument("--reveal", action="store_true", help="show the file selected in its folder")
 
+    s = sp.add_parser("looks")
+    s = sp.add_parser("templates")
+    s = sp.add_parser("asset")
+    s.add_argument("action", choices=["register"])
+    s.add_argument("project")
+    s.add_argument("file", help="path inside the project, e.g. media/hero.jpg")
+    s.add_argument("--origin", required=True, choices=["user", "ai-generated", "stock", "engine"])
+    s.add_argument("--provider")
+    s.add_argument("--license")
+    s.add_argument("--prompt")
+    s.add_argument("--credit")
+    s.add_argument("--url")
+
     s = sp.add_parser("voiceover")
     s.add_argument("textfile")
     s.add_argument("out")
@@ -419,7 +471,8 @@ def main(argv=None):
         return {"doctor": cmd_doctor, "settings": cmd_settings, "brand": cmd_brand, "project": cmd_project,
                 "inspect": cmd_inspect, "card": cmd_card, "render": cmd_render, "qc": cmd_qc,
                 "transcribe": cmd_transcribe, "captions": cmd_captions, "voiceover": cmd_voiceover,
-                "open": cmd_open}[a.cmd](a, lang)
+                "open": cmd_open, "looks": cmd_looks, "templates": cmd_templates,
+                "asset": cmd_asset}[a.cmd](a, lang)
     except StudioError as e:
         msg = explain_error(e, lang)
         if a.json:

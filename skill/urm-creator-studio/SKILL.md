@@ -50,21 +50,28 @@ Details: `reference/modes.md`. Save with `studio.py settings --mode beginner|cre
 
 1. **Brief** — what video, for whom, where it will be posted, how long. (`onboarding.md`, `creative-direction.md`)
 2. **Brand** — use the saved brand; if none, offer quick setup or continue unbranded. (`brand-system.md`)
-3. **Assets** — ask the user to put files in `~/URM-Creator-Studio/inbox/` (or drag them into the chat) and
-   copy them into the project with `project add`. Originals are never modified.
+3. **Assets & production mode** — ask the user to put any files they have in `~/URM-Creator-Studio/inbox/`
+   (or drag them into the chat) and copy them into the project with `project add`. Originals are never
+   modified. Then choose the production mode (`reference/creative-production.md` §0):
+   **A — asset-led** (their footage/photos lead), **B — creative-led** (only an idea: you design the whole
+   video with motion scenes, an original soundtrack and a temporary identity), or **mixed**. Missing assets
+   never block production and never mean a slideshow.
 4. **Analyse** — `studio.py --json inspect <files> --sheet <project>/work/sheets`, then LOOK at the contact
    sheets before planning. Describe what you saw in one or two sentences. **If a clip contains speech**, run
    `studio.py transcribe <clip> --language ar|en` now and read the draft, so the plan (hook, on-screen text,
    trims) matches what the person actually says. Captions are reviewed with the user later
    (`reference/audio-captions.md`).
-5. **Plan** — write `plan.json` (`reference/plan-reference.md`). Show the user a short, numbered scene list
-   in their language with the exact on-screen texts. **Wait for approval.**
+5. **Plan** — Mode B / mixed: concept, story arc, copy, look and storyboard first
+   (`reference/creative-production.md`). Write `plan.json` (`reference/plan-reference.md`). Show the user a
+   short, numbered scene list in their language with the exact on-screen texts. **Wait for approval.**
 6. **Preview** — `render <project> --preview` (fast, half size). Inspect the QC frames yourself, then
    **open the preview for the user** (`studio.py open latest --project <slug>`) — images you Read are visible
    only to you.
 7. **Final** — after the user approves the preview: `render <project>`. Read `QC_REPORT.md` and **open
    `qc/text_frames.png` with the Read tool** before saying anything about the result (`quality-control.md`).
-8. **Deliver** — tell the user where the video is (in friendly words), its length and shape, and offer to open
+8. **Deliver** — tell the user where the video is (in friendly words), its length and shape, the cover image
+   (`cover.jpg`), and — for creative-led videos — one sentence on what the engine generated and what came from
+   the user or a provider (`production.json`). Offer to open
    the folder for them (macOS `open -R "<video>"`, Windows `explorer /select,"<video>"`) so they can play it by
    double-clicking. If you mention the `.srt` subtitle file, explain it in one line. Offer other shapes
    (`--format square|portrait|landscape`). Never upload or publish anything yourself.
@@ -83,8 +90,14 @@ Details: `reference/modes.md`. Save with `studio.py settings --mode beginner|cre
 - **Speech:** never invent transcripts. Unclear segments are marked `[؟]`/`[?]` and must be reviewed with the
   user before captions are burned in. Ask before replacing original audio or adding synthetic narration,
   and label synthetic narration as such.
-- **Licences:** use only media, music and fonts the user owns or has a licence for, or the bundled OFL
-  fonts. If unsure, ask. Never download music or footage from the internet for the user's video.
+- **Licences:** use only media, music and fonts the user owns or has a licence for, the bundled OFL fonts,
+  and what the engine generates (motion graphics, original soundtrack). Never download music, footage or
+  images from websites. AI-generated or stock media only through a generation/stock tool that is actually
+  available in this session, with the user's OK, under that provider's terms, and recorded with
+  `asset register` (provider + licence). Never claim generated or stock media was made by URM Creator Studio,
+  and never pretend an integration, subscription or licence exists.
+- **Truthful content:** numbers, prices, ratings, testimonials and claims such as "certified" come from the
+  user. Never invent statistics, quotes or reviews to fill a template.
 - **Software:** ask before installing anything or changing system settings; explain what and why first.
 - **Engine integrity:** never edit, patch, replace or add files inside `<skill>` (the engine, references,
   fonts) during a user's session, even to work around a bug. If a render looks wrong, tell the user plainly
@@ -102,7 +115,8 @@ Details: `reference/modes.md`. Save with `studio.py settings --mode beginner|cre
 | `reference/modes.md` | Beginner / Creator / Pro behaviour |
 | `reference/brand-system.md` | Brand setup, updates, no-logo and no-brand cases |
 | `reference/creative-direction.md` | Video recipes for 10 video types, hooks, pacing, copywriting |
-| `reference/plan-reference.md` | plan.json format and every engine command |
+| `reference/creative-production.md` | Mode B / mixed: idea → concept → copy → look → assets ladder → motion → score → QC |
+| `reference/plan-reference.md` | plan.json format (incl. motion scenes, looks, score) and every engine command |
 | `reference/motion-graphics.md` | Animations, transitions, safe areas, intros/outros |
 | `reference/arabic-typography.md` | RTL, fonts, numerals, mixed text, verification |
 | `reference/audio-captions.md` | Captions, transcription, music, voiceover |

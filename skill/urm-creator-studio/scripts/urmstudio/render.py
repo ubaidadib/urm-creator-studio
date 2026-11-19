@@ -3,6 +3,8 @@ source media is only ever read.
 
 Pipeline
   1. text cards (headlines, lower thirds, captions, intro/outro) -> transparent PNGs via Chromium
+  1b. motion-design scenes (creative-led production) -> frame-by-frame canvas renders via Chromium (motion.py)
+  1c. original soundtrack + sound design when the plan asks for a score and has no music file
   2. one normalised segment per scene (framing, motion, speed, scene text animation)
   3. join segments (cut or transition)
   4. final pass: lower thirds, captions, watermark, music + ducking, loudness
@@ -19,10 +21,12 @@ import time
 from pathlib import Path
 
 from . import brand as brandmod
+from . import looks as looksmod
 from .captions import parse as parse_captions, write_srt, write_vtt, check as check_captions
 from .common import (FORMATS, SAFE_MARGINS, StudioError, VERSION, read_json, run, studio_home,
                      text_direction, write_json, has_arabic)
 from .media import ffmpeg_bin, kind_of, probe
+from .motion import MotionStudio, render_score, validate_motion_scene
 from .textrender import (CardRenderer, build_card_html, count_words, font_face_css, font_stack,
                          to_html)
 
@@ -65,9 +69,11 @@ def validate_plan(plan, project_dir):
         errs.append("the plan has no scenes")
     for i, sc in enumerate(scenes, 1):
         k = sc.get("kind")
-        if k not in ("video", "image", "title"):
-            errs.append("scene %d: kind must be video, image or title" % i)
+        if k not in ("video", "image", "title", "motion"):
+            errs.append("scene %d: kind must be video, image, title or motion" % i)
             continue
+        if k == "motion":
+            errs += validate_motion_scene(i, sc, project_dir)
         if k in ("video", "image"):
             src = resolve_src(project_dir, sc.get("src"))
             if not src or not src.exists():
@@ -183,6 +189,8 @@ def scene_duration(sc, info=None):
         end = float(end) if end is not None else full
         end = min(end, full) if full else end
         return max(0.2, (end - start) / float(sc.get("speed", 1) or 1))
+    if k == "motion":
+        return round(float(sc.get("duration", 3.0)) * 30) / 30.0  # whole frames
     return float(sc.get("duration", 3.0))
 
 
@@ -308,7 +316,7 @@ def outro_card(W, H, fmt, brand, bs, lang, cta_override=None):
 # Segment building
 # --------------------------------------------------------------------------
 
-def framing_filter(mode, W, H, src_w, src_h, focus="center"):
+def framing_filter(mode, W, H, src_w, src_h, focus="center", tint=None):
     if mode == "auto":
         if src_w and src_h:
             r_src, r_dst = src_w / src_h, W / H
@@ -318,9 +326,14 @@ def framing_filter(mode, W, H, src_w, src_h, focus="center"):
     if mode == "fit_blur":
         # blurred, darkened copy fills the frame; the full picture sits on top
         return ("split=2[fbA][fbB];[fbA]scale=%d:%d:force_original_aspect_ratio=increase,crop=%d:%d,"
-                "boxblur=luma_radius=10:luma_power=2,scale=%d:%d,eq=brightness=-0.08[fbBG];"
+                "boxblur=luma_radius=10:luma_power=2,scale=%d:%d,eq=brightness=-0.08%s[fbBG];"
                 "[fbB]scale=%d:%d:force_original_aspect_ratio=decrease[fbFG];"
-                "[fbBG][fbFG]overlay=(W-w)/2:(H-h)/2" % (W // 4, H // 4, W // 4, H // 4, W, H, W, H))
+                "[fbBG][fbFG]overlay=(W-w)/2:(H-h)/2"
+                % (W // 4, H // 4, W // 4, H // 4, W, H,
+                   # creative/mixed: the blurred surround takes the look's stage colour, so footage sits
+                   # inside the same visual world as the motion scenes
+                   (",drawbox=x=0:y=0:w=iw:h=ih:color=0x%s@0.62:t=fill" % tint.lstrip("#")) if tint else "",
+                   W, H))
     if mode == "fit_color":
         return ("scale=%d:%d:force_original_aspect_ratio=decrease,pad=%d:%d:(ow-iw)/2:(oh-ih)/2:color=black"
                 % (W, H, W, H))
@@ -343,18 +356,19 @@ def build_segment(ctx, idx, sc, out_path):
     fc = []
     kind = sc["kind"]
     has_audio = False
-    if kind == "video":
+    if kind in ("video", "motion"):
         src = sc["_src"]
         info = sc["_info"]
-        start = float(sc.get("start", 0))
-        speed = float(sc.get("speed", 1) or 1)
+        motion = kind == "motion"  # a rendered motion-design clip: exact size, silent, untrimmed
+        start = 0.0 if motion else float(sc.get("start", 0))
+        speed = 1.0 if motion else float(sc.get("speed", 1) or 1)
         args += ["-ss", "%.3f" % start, "-t", "%.3f" % (dur * speed + 0.05), "-i", str(src)]
-        vf = hdr_filter(info) + framing_filter(sc.get("framing", "auto"), W, H, info.get("width"),
-                                               info.get("height"), sc.get("focus", "center"))
+        vf = hdr_filter(info) + framing_filter("fill" if motion else sc.get("framing", "auto"), W, H, info.get("width"),
+                                               info.get("height"), sc.get("focus", "center"), getattr(ctx, "tint", None))
         if speed != 1:
             vf = "setpts=PTS/%.4f," % speed + vf
         fc.append("[0:v]%s,fps=%s,setsar=1,format=yuv420p[base0]" % (vf, fps))
-        vol = float(sc.get("volume", 1.0))
+        vol = 0.0 if motion else float(sc.get("volume", 1.0))
         if info.get("has_audio") and vol > 0:
             has_audio = True
             a = "[0:a]aresample=48000,aformat=channel_layouts=stereo,volume=%.3f" % vol
@@ -371,12 +385,12 @@ def build_segment(ctx, idx, sc, out_path):
             args += ["-loop", "1", "-t", "%.3f" % dur, "-i", str(src)]
             fc.append("[0:v]%s,fps=%s,setsar=1,format=yuv420p[base0]" % (
                 framing_filter(sc.get("framing", "auto"), W, H, info.get("width"), info.get("height"),
-                               sc.get("focus", "center")), fps))
+                               sc.get("focus", "center"), getattr(ctx, "tint", None)), fps))
         else:
             args += ["-i", str(src)]
             W2, H2 = int(W * 1.5) // 2 * 2, int(H * 1.5) // 2 * 2
             pre = framing_filter(sc.get("framing", "auto"), W2, H2, info.get("width"), info.get("height"),
-                                 sc.get("focus", "center"))
+                                 sc.get("focus", "center"), getattr(ctx, "tint", None))
             z = {"zoom_in": "1+0.10*on/%d" % frames, "zoom_out": "1.10-0.10*on/%d" % frames}.get(motion, "1.10")
             x = "iw/2-(iw/zoom/2)"
             if motion == "pan_left":
@@ -452,40 +466,84 @@ def _q(a):
 # Join + final pass
 # --------------------------------------------------------------------------
 
-def join_segments(ctx, segs, durs, out_path, transition):
+def boundary_plan(ctx, scenes, durs, transition):
+    """Transition for every boundary i (between scene i-1 and i): (xfade type, duration) or ("cut", 0).
+
+    Two motion scenes meet with a hard cut: their designed transitions are drawn inside the frames and the
+    background world is continuous, so the cut is invisible. Intro/outro always dissolve gently.
+    """
     ttype = (transition or {}).get("type", "fade")
     td = float((transition or {}).get("duration", 0.35))
     if ttype == "slide":
         ttype = "slideright" if ctx.rtl else "slideleft"  # RTL stories move the other way
-    if ttype == "none" or len(segs) == 1 or ttype not in XFADE_OK:
-        lst = out_path.with_suffix(".txt")
-        lst.write_text("".join("file '%s'\n" % str(s).replace("'", "'\\''") for s in segs), encoding="utf-8")
-        args = [ffmpeg_bin(), "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", str(lst), "-c", "copy",
-                str(out_path)]
-        run(args)
+    if ttype not in XFADE_OK:
+        ttype = "none"
+    bounds = [None]
+    for i in range(1, len(scenes)):
+        a, b = scenes[i - 1], scenes[i]
+        cap = min(durs[i - 1], durs[i]) / 2.5
+        if a["kind"] == "motion" and b["kind"] == "motion":
+            bounds.append(("cut", 0.0))
+        elif b.get("_role") == "outro" or a.get("_role") == "intro":
+            bounds.append(("fade", min(max(td, 0.3), cap)))
+        elif ttype == "none":
+            bounds.append(("cut", 0.0))
+        else:
+            bounds.append((ttype, min(td, cap)))
+    return bounds
+
+
+def _concat(segs, out_path):
+    lst = out_path.with_suffix(".txt")
+    lst.write_text("".join("file '%s'\n" % str(s).replace("'", "'\\''") for s in segs), encoding="utf-8")
+    run([ffmpeg_bin(), "-y", "-v", "error", "-f", "concat", "-safe", "0", "-i", str(lst), "-c", "copy", str(out_path)])
+    return out_path
+
+
+def join_segments(ctx, segs, durs, out_path, bounds):
+    """Hard cuts are joined losslessly first (concat); dissolves/wipes then run between those groups. A cut is
+    never faked as a one-frame crossfade: xfade drops the rest of the video when frame rounding leaves its
+    first input a hair shorter than offset + duration."""
+    if len(segs) == 1 or all(bd[1] == 0 for bd in bounds[1:]):
+        _concat(segs, out_path)
         return [sum(durs[:i]) for i in range(len(durs))], sum(durs)
-    td = min(td, min(durs) / 2.5)
+    groups = [[0]]
+    for i in range(1, len(segs)):
+        if bounds[i][1] == 0:
+            groups[-1].append(i)
+        else:
+            groups.append([i])
+    gfiles, gdurs, gbounds = [], [], [None]
+    for n, g in enumerate(groups):
+        if len(g) == 1:
+            gfiles.append(segs[g[0]])
+        else:
+            gfiles.append(_concat([segs[i] for i in g], out_path.with_name("group_%02d.mp4" % n)))
+        gdurs.append(sum(durs[i] for i in g))
+        if n:
+            gbounds.append(bounds[g[0]])
     args = [ffmpeg_bin(), "-y", "-v", "error", "-nostdin"]
-    for s in segs:
+    for s in gfiles:
         args += ["-i", str(s)]
     fc = []
     vprev, aprev = "0:v", "0:a"
     offset = 0.0
-    starts = [0.0]
-    for i in range(1, len(segs)):
-        offset += durs[i - 1] - td
-        starts.append(offset)
-        # intro/outro always dissolve gently; story cuts use the chosen transition
-        tt = "fade" if (ctx.roles[i] in ("outro",) or ctx.roles[i - 1] == "intro") else ttype
-        fc.append("[%s][%d:v]xfade=transition=%s:duration=%.3f:offset=%.3f[xv%d]" % (vprev, i, tt, td, offset, i))
-        fc.append("[%s][%d:a]acrossfade=d=%.3f:c1=tri:c2=tri[xa%d]" % (aprev, i, td, i))
+    for i in range(1, len(gfiles)):
+        tt, td = gbounds[i]
+        offset += gdurs[i - 1] - td
+        fc.append("[%s][%d:v]xfade=transition=%s:duration=%.4f:offset=%.4f[xv%d]" % (vprev, i, tt, td, offset, i))
+        fc.append("[%s][%d:a]acrossfade=d=%.4f:c1=tri:c2=tri[xa%d]" % (aprev, i, td, i))
         vprev, aprev = "xv%d" % i, "xa%d" % i
-    total = offset + durs[-1]
+    total = offset + gdurs[-1]
     args += ["-filter_complex", ";".join(fc), "-map", "[%s]" % vprev, "-map", "[%s]" % aprev,
              "-c:v", ctx.vcodec, *ctx.inter_opts, "-r", str(ctx.fps), "-c:a", "aac", "-b:a", "256k",
              str(out_path)]
     ctx.log.append(" ".join(_q(a) for a in args))
     run(args, timeout=60 * 60)
+    starts, acc = [], 0.0
+    for i, d in enumerate(durs):
+        starts.append(acc)
+        acc += d - (bounds[i + 1][1] if i < len(durs) - 1 else 0)
     return starts, total
 
 
@@ -558,8 +616,9 @@ def final_pass(ctx, main, total, global_ovs, out_mp4, audio_cfg, watermark, sfx_
     if music:
         args += ["-stream_loop", "-1", "-i", str(music["src"])]
         mv = float(music.get("volume", 0.18))
-        fc.append("[%d:a]aformat=sample_rates=48000:channel_layouts=stereo,atrim=0:%.3f,volume=%.3f,"
-                  "afade=t=in:d=1.0,afade=t=out:st=%.3f:d=2.0[mus]" % (n_in, total, mv, max(0, total - 2.0)))
+        fades = (",afade=t=in:d=1.0,afade=t=out:st=%.3f:d=2.0" % max(0, total - 2.0)) if music.get("fade", True) else ""
+        fc.append("[%d:a]aformat=sample_rates=48000:channel_layouts=stereo,atrim=0:%.3f,volume=%.3f%s[mus]"
+                  % (n_in, total, mv, fades))
         n_in += 1
         if duck:
             sc_in = "[asc2]" if vo else "[asc]"
@@ -596,6 +655,66 @@ def final_pass(ctx, main, total, global_ovs, out_mp4, audio_cfg, watermark, sfx_
              "-movflags", "+faststart", "-metadata", "comment=Made with URM Creator Studio", str(out_mp4)]
     ctx.log.append(" ".join(_q(a) for a in args))
     run(args, timeout=60 * 60)
+
+
+def production_summary(plan, scenes, durs, look, identity, score_used, project_dir):
+    """What the video is made of and where every element came from (provenance for the manifest + QC gates)."""
+    from .project import asset_registry
+    reg = asset_registry(project_dir)
+    content = [(sc, d) for sc, d in zip(scenes, durs) if sc.get("_role") == "scene"]
+    total = sum(d for _, d in content) or 1.0
+    by_kind = {}
+    for sc, d in content:
+        by_kind[sc["kind"]] = round(by_kind.get(sc["kind"], 0) + d, 2)
+    user_media = [sc for sc, _ in content if sc["kind"] in ("video", "image")]
+    # "static" = stills and plain title cards without motion design around them
+    static = sum(d for sc, d in content if sc["kind"] == "title" or (sc["kind"] == "image" and not sc.get("texts")))
+    mode = (plan.get("production") or {}).get("mode")
+    if mode not in ("asset", "creative", "mixed"):
+        mode = "creative" if not user_media else ("mixed" if by_kind.get("motion") else "asset")
+    assets = []
+    seen = set()
+    for sc, _ in content:
+        srcs = []
+        if sc["kind"] in ("video", "image"):
+            srcs.append(sc.get("src"))
+        if sc["kind"] == "motion" and (sc.get("params") or {}).get("image"):
+            srcs.append(sc["params"]["image"])
+        for src in srcs:
+            if not src or src in seen:
+                continue
+            seen.add(src)
+            r = reg.get(str(src).replace("\\", "/"), {})
+            assets.append({"file": src, "origin": r.get("origin", "user"), "provider": r.get("provider"),
+                           "license": r.get("license"), "prompt": r.get("prompt"), "credit": r.get("credit")})
+    au = plan.get("audio") or {}
+    if au.get("music"):
+        m = au["music"] if isinstance(au["music"], dict) else {"src": au["music"]}
+        r = reg.get(str(m.get("src")).replace("\\", "/"), {})
+        assets.append({"file": m.get("src"), "kind": "music", "origin": r.get("origin", "user"),
+                       "provider": r.get("provider"), "license": r.get("license"), "credit": r.get("credit")})
+    if score_used:
+        assets.append({"file": "soundtrack (synthesised)", "kind": "music", "origin": "engine",
+                       "provider": "URM Creator Studio", "license": "original, generated for this video"})
+    if by_kind.get("motion"):
+        assets.append({"file": "motion graphics", "kind": "graphics", "origin": "engine",
+                       "provider": "URM Creator Studio", "license": "original, generated for this video"})
+    templates = [sc.get("template") for sc, _ in content if sc["kind"] == "motion"]
+    return {"mode": mode, "content_seconds": round(total, 2), "seconds_by_kind": by_kind,
+            "static_share": round(static / total, 3), "templates": templates,
+            "distinct_templates": len(set(templates)), "look": (look or {}).get("name"),
+            "palette": {k: ((look or {}).get("palette") or {}).get(k) for k in ("primary", "secondary", "accent", "bg")} if look else None,
+            "identity": {k: v for k, v in (identity or {}).items() if k in ("name", "initials", "temporary")} or None,
+            "score": score_used, "assets": assets,
+            "has_cta": any(t == "cta" for t in templates) or any(sc.get("_role") == "outro" for sc in scenes)}
+
+
+def cover_time(scenes, starts, motion_cards, intro_end, total):
+    """A strong frame for the cover: the first motion headline fully visible, else 1 s into the content."""
+    firsts = sorted(c["start"] for c in motion_cards if c["start"] < total * 0.5)
+    if firsts:
+        return round(min(total - 0.1, firsts[0] + 0.5), 2)
+    return round(min(total - 0.1, max(intro_end + 1.0, 0.5)), 2)
 
 
 def loudness_touchup(mp4, target, ctx):
@@ -718,18 +837,18 @@ def render(project_dir, preview=False, fmt_override=None, lang=None, progress=pr
     durs = [sc["_dur"] for sc in scenes]
     ctx.roles = [sc["_role"] for sc in scenes]
 
-    # timeline positions need transition overlap
+    # timeline positions need transition overlap (per boundary: motion scenes cut under their own transitions)
     tr = plan.get("transition") or {"type": "fade", "duration": 0.35}
-    ttype = tr.get("type", "fade")
-    td = 0.0 if (ttype == "none" or len(scenes) == 1) else min(float(tr.get("duration", 0.35)), min(durs) / 2.5)
+    bounds = boundary_plan(ctx, scenes, durs, tr)
     starts = []
     acc = 0.0
     for i, d in enumerate(durs):
         starts.append(acc)
-        acc += d - (td if i < len(durs) - 1 else 0)
+        acc += d - (bounds[i + 1][1] if i < len(durs) - 1 else 0)
     total = acc
-    intro_end = durs[0] - td / 2 if ctx.roles[0] == "intro" else 0.0
-    outro_start = starts[-1] + td / 2 if ctx.roles[-1] == "outro" else total
+    td = max([bd[1] for bd in bounds[1:]] or [0.0])
+    intro_end = durs[0] - (bounds[1][1] if len(bounds) > 1 else 0) / 2 if ctx.roles[0] == "intro" else 0.0
+    outro_start = starts[-1] + bounds[-1][1] / 2 if ctx.roles[-1] == "outro" and len(bounds) > 1 else total
     content_offset = starts[1] if ctx.roles[0] == "intro" and len(starts) > 1 else 0.0
 
     # ---------- global overlays ----------
@@ -787,6 +906,69 @@ def render(project_dir, preview=False, fmt_override=None, lang=None, progress=pr
         watermark = {"png": cards.add(wm_html, W, H), "opacity": float((brand.get("watermark") or {}).get("opacity", 0.85)),
                      "start": intro_end, "end": outro_start}
 
+    # ---------- motion-design scenes (creative-led production) ----------
+    motion_idx = [i for i, sc in enumerate(scenes) if sc["kind"] == "motion"]
+    motion_cards, motion_events = [], []
+    look = identity = None
+    if motion_idx:
+        look = looksmod.resolve_look(plan, brand)
+        if brand:
+            look["custom_fonts"] = bs.get("custom_fonts") or []
+        identity = looksmod.resolve_identity(plan, brand, lang_text, brandmod.logo_file(brand))
+        if (plan.get("production") or {}).get("mode") in ("creative", "mixed", None):
+            ctx.tint = (look.get("palette") or {}).get("bg")
+        trans = look.get("transitions") or ["swap"]
+        mscenes = []
+        for n, i in enumerate(motion_idx):
+            sc = scenes[i]
+            prev_m = i > 0 and scenes[i - 1]["kind"] == "motion"
+            next_m = i + 1 < len(scenes) and scenes[i + 1]["kind"] == "motion"
+            # matched pairs: the outgoing scene's cover is the incoming scene's reveal
+            if next_m and "tout" not in sc:
+                sc["tout"] = scenes[i + 1].get("tin") or trans[n % len(trans)]
+            if prev_m and "tin" not in sc:
+                sc["tin"] = scenes[i - 1].get("tout", "swap")
+            sc.setdefault("tin", "swap")
+            sc.setdefault("tout", "swap")
+            if not next_m and sc["tout"] in ("panels", "circle"):
+                sc["tout"] = "swap"   # a cover only works when the next scene uncovers it
+            if not prev_m and sc["tin"] in ("panels", "circle"):
+                sc["tin"] = "swap"
+            mscenes.append(dict(sc, duration=sc["_dur"], _t0=starts[i]))
+        studio = MotionStudio(W=W, H=H, fps=fps, fmt=fmt, safe=SAFE_MARGINS[fmt], rtl=ctx.rtl, numerals=numerals,
+                              look=look, identity=identity, scenes=mscenes, project_dir=project_dir,
+                              log=ctx.log)
+        progress("• motion design: %d scenes (look: %s)" % (len(motion_idx), look.get("name")))
+        layout = studio.layout()
+        for n, i in enumerate(motion_idx):
+            lay = layout[n] if n < len(layout) else {}
+            for tx in lay.get("texts", []):
+                motion_cards.append({"scene": "motion", "kind": "motion_text", "text": tx["text"], "bbox": tx["bbox"],
+                                     "t": starts[i] + min(max(tx["full_from"] + 0.4, (tx["full_from"] + tx["end"]) / 2),
+                                                          tx["end"] - 0.1),
+                                     "start": starts[i] + tx["full_from"], "end": starts[i] + tx["end"],
+                                     "full_visible": round(tx["end"] - tx["full_from"], 2), "template": scenes[i]["template"]})
+            for e in lay.get("events", []):
+                motion_events.append(dict(e, t=round(starts[i] + e["t"], 3)))
+        # clips are cached by content: a re-render after a soundtrack, caption or text-card change reuses them
+        cache = project_dir / "work" / "motion-cache"
+        cache.mkdir(parents=True, exist_ok=True)
+        outs, todo = {}, {}
+        for n, i in enumerate(motion_idx):
+            key = studio.scene_key(n, ctx.vcodec, ctx.inter_opts)
+            outs[n] = cache / ("motion_%s.mp4" % key)
+            if not outs[n].exists():
+                todo[n] = work / ("motion_%02d.part.mp4" % i)
+        if todo:
+            studio.render_scenes(todo, ctx.vcodec, ctx.inter_opts, progress=progress)
+            for n, tmp_out in todo.items():
+                os.replace(tmp_out, outs[n])
+        else:
+            progress("  ✓ motion scenes unchanged (reused)")
+        for n, i in enumerate(motion_idx):
+            scenes[i]["_src"] = outs[n]
+            scenes[i]["_info"] = probe(outs[n])
+
     progress("• text cards: rendering with %s" % Path(cards.browser).name)
     cards.run()
 
@@ -798,7 +980,7 @@ def render(project_dir, preview=False, fmt_override=None, lang=None, progress=pr
 
     progress("• joining scenes")
     main = work / "main.mp4"
-    join_segments(ctx, segs, durs, main, tr)
+    join_segments(ctx, segs, durs, main, bounds)
 
     audio_cfg = dict(plan.get("audio") or {})
     music = audio_cfg.get("music")
@@ -811,11 +993,38 @@ def render(project_dir, preview=False, fmt_override=None, lang=None, progress=pr
         v = vo if isinstance(vo, dict) else {"src": vo}
         audio_cfg["voiceover"] = {"src": resolve_src(project_dir, v["src"]), "start": float(v.get("start", 0)) + content_offset,
                                   "volume": v.get("volume", 1.0)}
+        audio_cfg["voiceover"]["length"] = probe(audio_cfg["voiceover"]["src"]).get("duration") or 0.0
         sources.append(audio_cfg["voiceover"]["src"])
+    # ---------- original soundtrack (creative-led: no music file needed) ----------
+    score_cfg = audio_cfg.get("score")
+    # creative/mixed productions never go out silent by accident: with no music file and no score requested,
+    # compose one in the look's mood ("score": false opts out explicitly)
+    pmode = (plan.get("production") or {}).get("mode")
+    if score_cfg is None and not audio_cfg.get("music") and (
+            pmode in ("creative", "mixed") or (pmode is None and motion_idx)):
+        score_cfg = {"auto": True}
+    score_used = None
+    if score_cfg and not audio_cfg.get("music"):
+        score_cfg = dict(score_cfg) if isinstance(score_cfg, dict) else {}
+        ev_all = list(motion_events) if score_cfg.get("sfx", True) else []
+        if score_cfg.get("sfx", True):
+            for i in range(1, len(scenes)):
+                if not (scenes[i]["kind"] == "motion" and scenes[i - 1]["kind"] == "motion"):
+                    ev_all.append({"t": round(starts[i], 3), "type": "whoosh", "strength": 0.6})
+        cta = [starts[i] for i, sc in enumerate(scenes) if sc.get("template") in ("cta",) or sc["_role"] == "outro"]
+        sspec = {"duration": round(total, 3), "mood": score_cfg.get("mood") or (look or {}).get("mood") or "inspiring",
+                 "bpm": score_cfg.get("bpm"), "seed": int(score_cfg.get("seed", 5)), "events": ev_all,
+                 "climax": cta[-1] if cta else None, "sfx": score_cfg.get("sfx", True)}
+        progress("• original soundtrack (%s)" % sspec["mood"])
+        wav = render_score(sspec, work / "soundtrack.wav", log=ctx.log)
+        has_vo = bool(audio_cfg.get("voiceover"))
+        audio_cfg["music"] = {"src": wav, "volume": float(score_cfg.get("volume", 0.32 if has_vo else 1.0)), "fade": False}
+        audio_cfg.setdefault("duck", has_vo)
+        score_used = {"mood": sspec["mood"], "events": len(ev_all), "auto": bool(score_cfg.get("auto")), "generated_by": "URM Creator Studio engine (synthesised, original)"}
     sfx_times = []
-    if audio_cfg.get("sfx") and td > 0:
+    if audio_cfg.get("sfx") and td > 0 and not score_used:
         ctx.whoosh = whoosh_wav(project_dir / "work" / "whoosh.wav")
-        sfx_times = [starts[i] for i in range(1, len(starts))]
+        sfx_times = [starts[i] for i in range(1, len(starts)) if bounds[i][0] != "cut"]
 
     has_sound = any(sc["kind"] == "video" and sc["_info"].get("has_audio") and float(sc.get("volume", 1.0)) > 0
                     for sc in scenes) or bool(audio_cfg.get("music") or audio_cfg.get("voiceover") or sfx_times)
@@ -862,6 +1071,13 @@ def render(project_dir, preview=False, fmt_override=None, lang=None, progress=pr
         used_cards.append({"scene": ov["kind"], "png": str(ov["png"]), "text": ov["text"],
                            "t": (ov["start"] + ov["end"]) / 2, "start": ov["start"], "end": ov["end"],
                            "kind": ov["kind"]})
+    used_cards += motion_cards
+    onscreen = sorted([c for c in used_cards if c["kind"] in ("scene_text", "motion_text") and c["text"] not in ("intro", "outro")],
+                      key=lambda c: c["start"])
+    if onscreen and not cues_final:
+        # no speech: the on-screen words as a subtitle file (accessibility, platform captions, translation)
+        write_srt([{"start": max(0.0, c["start"]), "end": max(c["start"] + 0.5, c["end"]), "text": c["text"]} for c in onscreen],
+                  vdir / "onscreen_text.srt")
     if watermark:
         used_cards.append({"scene": "watermark", "png": str(watermark["png"]), "text": "logo",
                            "t": (watermark["start"] + watermark["end"]) / 2, "kind": "watermark"})
@@ -876,6 +1092,10 @@ def render(project_dir, preview=False, fmt_override=None, lang=None, progress=pr
         "hdr_sources": [str(sc["_src"]) for sc in scenes if sc.get("_info", {}).get("hdr")],
         "caption_problems": check_captions([c for c in cues_final]) if cues_final else [],
         "quiet_source_lufs": quiet_source,
+        "voiceover": ({"start": round(audio_cfg["voiceover"]["start"], 3),
+                       "length": round(float(audio_cfg["voiceover"]["length"]), 3)} if audio_cfg.get("voiceover") else None),
+        "production": production_summary(plan, scenes, durs, look, identity, score_used, project_dir),
+        "cover_t": cover_time(scenes, starts, motion_cards, intro_end, total),
     }
     write_json(vdir / "render.json", meta)
     if not preview:

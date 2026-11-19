@@ -29,6 +29,10 @@ music anywhere, and speech-to-text (if installed) also runs locally. Keep in min
 is an online AI assistant: what you type in the chat, and anything you share or ask it to look at
 (for example the preview frames it checks), is processed by Claude as part of the conversation.
 
+Animated scenes and the original music for idea-only videos are also made on your computer. AI image, video or
+music services and stock libraries are optional: they are used only if you have connected one to Claude and say
+yes, and then your request goes to that company under its own terms and prices.
+
 ### 5. Will it post my videos to Instagram or TikTok?
 
 **No, never.** The studio does not upload, post, schedule or send videos, and never logs into your

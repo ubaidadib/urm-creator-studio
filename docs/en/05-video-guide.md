@@ -143,6 +143,38 @@ Please still **watch the video once yourself** before posting — only you can j
 
 ---
 
+## No footage, no logo, no music? No problem
+
+You can start with just an idea, for example: *"A 30-second promo for my language school, for international
+students. It should feel high-quality and trustworthy."* The studio then works as your creative team:
+
+- it writes a short concept and the on-screen words, and shows you the scene list before anything is made;
+- it designs every scene with animated graphics, moving text, icons, maps and transitions — **not** a
+  slideshow;
+- it picks colours and fonts that fit your business, and, if you have no logo, builds a simple temporary
+  name mark (you can swap in your real logo later);
+- it composes **original music** for your video, with sound effects timed to the animation — no licence
+  worries;
+- it only uses photos or clips from AI or stock services if such a service is connected and you agree, and
+  it tells you exactly where they came from.
+
+You get the finished video, a cover image, a subtitle file of the on-screen words and a short report.
+
+**What you receive and where.** The assistant opens the project folder for you (`studio.py open`). Inside it:
+
+| File | What it is | How to use it |
+|---|---|---|
+| `final-video_vertical.mp4` (or `_square`, `_landscape`) | the finished video, always the newest final | upload it to Instagram, TikTok, YouTube, WhatsApp — like any video from your phone |
+| `output/v001/cover.jpg` | a cover image taken from the strongest frame | choose it as the cover / thumbnail when you upload |
+| `output/v001/onscreen_text.srt` (or `captions.srt` when someone speaks) | the words as a subtitle file | upload it as captions on YouTube or Facebook; useful for translation |
+| `output/v001/QC_REPORT.md` | the quality check in plain words | nothing to do — the assistant reads it for you |
+
+**How long it takes.** A 30-second animated video takes a few minutes on a normal laptop (on the 8 GB Mac
+used for testing, about 3 minutes at full size; the half-size preview you see first takes about 1 minute). Close
+other heavy apps while it renders.
+
+---
+
 ## The assistant never publishes
 
 The studio never uploads, posts, schedules or sends your videos, and never logs into your social media

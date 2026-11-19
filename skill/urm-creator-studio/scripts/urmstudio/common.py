@@ -14,7 +14,7 @@ from pathlib import Path
 SKILL_DIR = Path(__file__).resolve().parent.parent.parent  # .../urm-creator-studio
 FONTS_DIR = SKILL_DIR / "fonts"
 TEMPLATES_DIR = SKILL_DIR / "templates"
-VERSION = "1.0.1"
+VERSION = "1.1.0"
 
 FORMATS = {
     # name: (width, height, plain-language label ar, en)

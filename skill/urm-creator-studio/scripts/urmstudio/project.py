@@ -105,3 +105,40 @@ def latest_version(slug, include_previews=True):
         outs += list(out.glob("preview-[0-9][0-9][0-9]"))
     outs = [o for o in outs if (o / "render.json").exists()]
     return max(outs, key=lambda o: (o / "render.json").stat().st_mtime) if outs else None
+
+
+# --------------------------------------------------------------------------
+# Asset provenance (assets.json): where each file in media/ came from
+# --------------------------------------------------------------------------
+
+ORIGINS = ("user", "ai-generated", "stock", "engine")
+
+
+def asset_registry(pdir):
+    p = Path(pdir) / "assets.json"
+    if not p.exists():
+        return {}
+    try:
+        return {k.replace("\\", "/"): v for k, v in read_json(p).get("assets", {}).items()}
+    except Exception:
+        return {}
+
+
+def register_asset(slug_or_dir, rel_path, origin, provider=None, license=None, prompt=None, credit=None, url=None):
+    """Record the origin of a media file. AI-generated and stock files must name their provider and licence;
+    the engine never claims third-party or generated material as its own work."""
+    pdir = Path(slug_or_dir) if Path(slug_or_dir).is_dir() else project_dir(slug_or_dir)
+    if origin not in ORIGINS:
+        raise StudioError("bad_plan", "origin must be one of %s" % ", ".join(ORIGINS))
+    if origin in ("ai-generated", "stock") and not (provider and license):
+        raise StudioError("bad_plan", "%s media needs --provider and --license (what the terms allow)" % origin)
+    rel = str(rel_path).replace("\\", "/")
+    if not (pdir / rel).exists():
+        raise StudioError("not_found", rel)
+    p = pdir / "assets.json"
+    data = read_json(p) if p.exists() else {"assets": {}}
+    data.setdefault("assets", {})[rel] = {k: v for k, v in {
+        "origin": origin, "provider": provider, "license": license, "prompt": prompt, "credit": credit, "url": url,
+        "registered_at": datetime.datetime.now().isoformat(timespec="seconds")}.items() if v}
+    write_json(p, data)
+    return data["assets"][rel]

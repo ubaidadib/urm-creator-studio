@@ -24,6 +24,9 @@ Use `--json` when you need to parse results; plain output is already bilingual-f
 | `open inbox\|home\|latest --project SLUG\|PATH [--reveal]` | Opens a folder/file on the user's screen (Finder/Explorer). |
 | `brand style SLUG luxury` · `brand colors SLUG [--apply]` | Re-apply a style preset · read logo colours (and apply them). |
 | `voiceover TEXT.txt OUT.wav --language ar --approved` | System voice narration (macOS), only after consent. |
+| `looks` | Visual looks for creative-led videos (palette, fonts, transitions, soundtrack mood). |
+| `templates` | Motion scene templates with required params, icon names, transitions, score moods. |
+| `asset register PROJECT media/FILE --origin user\|ai-generated\|stock\|engine [--provider P --license L --prompt T --credit C --url U]` | Records where a media file came from (AI/stock require provider + licence). Goes into `production.json`. |
 
 ## Project folder
 ```
@@ -35,8 +38,11 @@ projects/<slug>/
   work/             temporary files and text-card cache (safe to delete)
   output/preview-001/  quick half-size test versions (same contents as below)
   الفيديو-النهائي_<format>.mp4 / final-video_<format>.mp4   copy of the newest final (what the user opens)
-  output/v001/      <slug>_<format>.mp4, thumbnail.jpg, captions.srt/.vtt, plan.used.json,
-                    render.json, render.log, QC_REPORT.md, qc/ (frames, report.json)
+  assets.json       origin of media files (asset register)
+  output/v001/      <slug>_<format>.mp4, cover.jpg, thumbnail.jpg, captions.srt/.vtt or onscreen_text.srt,
+                    production.json (manifest), plan.used.json, render.json, render.log, QC_REPORT.md,
+                    qc/ (frames, report.json)
+  work/motion-cache/  rendered motion clips, reused when a scene is unchanged (safe to delete)
 ```
 
 ## plan.json
@@ -95,3 +101,45 @@ Notes
 - `framing: auto` fills when shapes match and uses a blurred background when a wide clip goes into a tall
   video (and vice versa) so nothing important is cut off.
 - Multi-format delivery: render again with `--format square` etc.; texts re-layout automatically.
+
+## Motion scenes (creative-led production)
+A `motion` scene is designed and animated by the engine (no media needed). Text inside it is part of the
+design (kinetic typography, Arabic shaped by Chromium); ordinary scene `texts` also work on top of it.
+```json
+{
+  "production": {"mode": "creative", "concept": "one line"},   // creative | asset | mixed (inferred if absent)
+  "look": "academy",                       // preset name (studio.py looks) or {"preset": "...", "palette": {...},
+                                           //   "transitions": ["slide","panels"], "mood": "...", "grid": true}
+                                           // absent + brand → derived from the brand; absent + no brand → academy
+  "identity": {"name": "Horizon Language Academy", "initials": "HL", "shape": "circle"},  // circle | squircle
+                                           // brand logo is used automatically; otherwise a temporary monogram
+  "scenes": [
+    {"kind": "motion", "template": "kinetic_title", "duration": 4.2,
+     "params": {"kicker": "Study abroad", "title": "Where will your next language take you?", "highlight": "next"},
+     "tin": "swap", "tout": "panels", "camera": "push"}    // all optional; the engine picks matched pairs
+  ],
+  "audio": {"score": {"mood": "inspiring", "sfx": true}},
+  "branding": {"intro": false, "outro": false}           // creative-led videos end on a cta scene instead
+}
+```
+| Template | Params (★ required) |
+|---|---|
+| `kinetic_title` | ★`title`, `kicker`, `subtitle`, `highlight` (one word of the title), `animation` (rise/words/pop/fade), `impact` |
+| `word_cloud` | ★`words` (6–14 short words, any script), `title`, `subtitle`, `highlight`, `bubbles` |
+| `globe` | `title`, `subtitle`, `highlight`, `hub` {lat, lon}, `points` [{lat, lon}] (random if absent) |
+| `features` | ★`items` [{`icon`, `title`, `text`}] (2–4), `title`, `highlight` |
+| `stats` | ★`items` [{`value`, `prefix`, `suffix`, `label`, `ring` 0–1}] (1–3, **true numbers only**), `title` |
+| `journey` | ★`steps` (2–6 short labels), `title`, `subtitle`, `highlight` |
+| `contrast` | ★`from`, ★`to`, `kicker`, `highlight` |
+| `quote` | ★`text` (**a real quote**), `author`, `stars` |
+| `showcase` | ★`image` (project path), `title`, `subtitle`, `chips` (≤ 3), `frame` (arch/round/circle) |
+| `cta` | `title`, `button`, `sub` (url/handle), `name`, `mark` (false = no mark) |
+| `logo_reveal` | `name`, `tagline` |
+
+Icons: globe book chat cap award users star check shield clock heart pin calendar phone spark chart plane
+bulb trophy briefcase home laptop gift mail play leaf rocket cart camera coffee music.
+Transitions (`tin`/`tout`): `swap` (scale + fade over the continuous background), `slide`, `panels` (colour
+bars wipe), `circle` (disc / iris), `none`. Between two motion scenes the cut happens under the transition,
+so it is invisible; next to footage the plan's `transition` is used.
+Duration: at least 1.2 s + 1.5 s + 0.3 s per on-screen word. Motion scenes are rendered at the plan's fps
+in whole frames; each takes roughly 30–60 s to render at full size (scenes render in parallel).

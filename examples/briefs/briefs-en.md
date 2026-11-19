@@ -24,3 +24,9 @@ English line under it: «تصميم يحكي قصتك» / "Design that tells you
 
 ## 6. Arabic subtitles for an English video
 I recorded an interview in English. Please add Arabic subtitles so my Arabic-speaking audience can follow.
+
+## Idea only (creative-led, no assets at all)
+Create a 30-second professional promotional video for a modern language school. The audience is international
+students. The video should communicate quality, opportunity and trust.
+→ The studio designs the whole video (motion scenes, original music, temporary name mark). Example plan:
+`examples/plans/language-school-creative.json`.

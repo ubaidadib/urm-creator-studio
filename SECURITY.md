@@ -21,6 +21,9 @@ repository. We aim to acknowledge reports within 7 days.
 - It invokes FFmpeg, ffprobe, a local Chromium browser (headless, with a temporary profile) and, optionally,
   whisper.cpp and the macOS `say` command, always with argument lists and never through a shell.
 - Text cards are local HTML files rendered from your own text; they load only bundled or brand fonts from disk.
+- Motion scenes and the original soundtrack are drawn by the same local browser from a page served by a
+  temporary web server bound to 127.0.0.1 only, which serves a whitelist of the project's own files and stops
+  when the render ends. Helper browsers and temporary folders are removed even when a render is stopped.
 - User media is copied read-only into the project; renders never write over source files.
 - The installers copy files into `~/.claude/skills` and ask before installing third-party software
   (FFmpeg/Python via Homebrew or winget).

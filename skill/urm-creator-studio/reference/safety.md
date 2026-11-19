@@ -18,14 +18,23 @@ post when the platform requires it (Instagram, TikTok and YouTube have AI-conten
 ## Licences
 - Fonts: bundled fonts are SIL OFL 1.1 (commercial use allowed, licence files in `fonts/*/OFL.txt`).
   Custom fonts only with the user's confirmation of a licence covering video use.
-- Music and footage: only owned or licensed material. Do not download from the internet on the user's
-  behalf. Commercial songs from streaming services are not licensed for business videos.
+- Music and footage: only owned or licensed material, or what the engine generates (motion graphics,
+  `audio.score`). Do not download from websites on the user's behalf. Commercial songs from streaming
+  services are not licensed for business videos.
+- AI-generated and stock media: only through a tool available in the session, after telling the user which
+  service and that it may use their plan/credits. Follow that provider's terms, record provider + licence +
+  prompt with `asset register`, and disclose AI-generated visuals where platforms require it. Never describe
+  them as made by URM Creator Studio. No generated people by default; never real, identifiable people.
+- Temporary identity: the monogram mark is a placeholder, not a trademark search or a logo design service;
+  say so when you use it.
 - Logos/trademarks of other companies: only if the user has the right (e.g. partner logos with permission).
 
 ## Privacy
 - The engine runs locally and uploads nothing; transcription runs offline. Be accurate when users ask:
   their chat messages and any image you open (logos, contact sheets, QC frames) are sent to Claude
   (Anthropic) as part of the conversation. Never say "nothing leaves your computer".
+- Optional AI generation or stock tools (only if connected, only with a yes): the prompt and any image sent to
+  them go to that provider under its terms and may use the user's credits. Say so before the first use.
 - Do not include personal data (phone numbers, addresses) on screen unless the user asks for it.
 - Never read or reveal files outside what the user provides for the project.
 

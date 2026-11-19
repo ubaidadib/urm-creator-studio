@@ -14,6 +14,27 @@ python3 tests/run_acceptance.py --fixtures /tmp/urm-fixtures --out /tmp/urm-acce
 python3 tests/run_acceptance.py --fixtures /tmp/urm-fixtures --out /tmp/urm-acc --only 3,5,x1
 ```
 
+```bash
+# 3. creative-led, mixed and audio matrix (≈15 minutes on an 8 GB Mac; C1/C2 render the 30 s acceptance briefs at full size;
+#    add --full for ≈25 minutes)
+python3 tests/regression_creative_led.py --fixtures /tmp/urm-fixtures --out /tmp/urm-creative
+```
+Owner acceptance matrix (14 scenarios; C1 and C2 always render at full size, `--full` renders the rest at full size):
+
+| ID | Scenario |
+|---|---|
+| C1 | asset-free English brief: 30 s language-school promo (no logo, colours, footage, images or music) |
+| C2 | asset-free Arabic version of the same brief (RTL, joined letters, Latin levels inside Arabic layout) |
+| C2B | Arabic asset-free brief without a business name |
+| C3 | mixed: user footage + user photo + AI-registered photo (provenance), no brand, no music |
+| C4 | existing brand: real logo + brand colours + footage; motion scenes follow the brand |
+| C5 / C5B | slideshow plan FAILS in creative mode / the same slideshow from the user's own assets still delivers (WARN) |
+| C6A–C6D | narration over the original score · user music + narration · narration longer than the video must FAIL · no music given → score composed |
+| C7 / C7B | export integrity, landscape (cuts + dissolves, short final scene, no black frames, clean decode) / motion-clip cache |
+| C8 | stopping a render leaves no helper browsers or temporary folders; the next render still works (run the suite alone) |
+
+Every scenario that writes `production.json` also checks it contains no absolute paths (no user or folder names).
+
 Results: `<out>/RESULTS.md`, `<out>/results.json`, and `<out>/frames/*.png`, one QC frame sheet per scenario.
 **Open the frame sheets and look at the Arabic text**; automatic checks can't tell whether letters join.
 

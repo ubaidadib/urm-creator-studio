@@ -27,6 +27,7 @@ Always ask before installing software. Explain what it is, that it is free, and 
 | Windows paths with Arabic names | | Supported; if a tool fails, move the project to a folder without special characters. |
 | "Permission denied" writing | | The workspace is in the user's home folder; check disk space and that the folder isn't read-only (cloud-sync placeholders). |
 | Out of disk space | | Delete `projects/*/work/` folders (ask first) and old versions the user no longer needs. |
+| `motion renderer did not finish layout/scene … within N s` (animated scenes only) | «المتصفح لم يستطع فتح صفحة الرسم المحلية على جهازك» / "The browser could not open the studio's local drawing page on this computer" | The motion engine opens a page served on 127.0.0.1 (this computer only). Security or firewall software that blocks local connections, a very busy machine, or an unusual setup (e.g. a changed home folder for the browser) can stop it. Ask the user to close heavy apps and allow local connections for Chrome, then retry; `URM_BROWSER` can point to another Chromium browser. Videos without animated scenes are not affected. |
 
 When a command fails, read its message (`--json` gives `error`, `message`, `detail`) and the version's
 `render.log`. Translate the cause; never paste raw logs to beginners.

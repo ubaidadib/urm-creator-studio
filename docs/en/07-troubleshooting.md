@@ -22,6 +22,7 @@ The easiest fix for almost anything: **describe the problem to the assistant in 
 | **FFmpeg missing** (Windows) | Same | In PowerShell: `winget install --id Gyan.FFmpeg -e`, then close and reopen Claude Code. If winget isn't available, the assistant walks you through a manual download. |
 | **FFmpeg missing** (Linux) | Same | `sudo apt install ffmpeg` (or your distribution's equivalent). |
 | **Browser missing** / "Chrome or Edge was not found" | The studio needs a browser to draw text, especially Arabic | Install Google Chrome from google.com/chrome. Edge, Chromium and Brave also work. |
+| **Animated scenes stop** with "motion renderer did not finish…" | The browser could not open the studio's temporary drawing page on your own computer (`127.0.0.1`) | Close heavy apps and try again. If you use security or firewall software, allow Chrome to make local connections. Videos made only from your own clips and photos are not affected. |
 | **Fonts missing** | The bundled font files weren't copied | Re-install the full package (unzip everything, run the installer again). |
 | **Python not found** (Mac) | Python isn't installed | Run `xcode-select --install` in Terminal (Apple's free developer tools), or install from python.org. Then run the installer again. |
 | **Python not found** (Windows) | Same | `winget install Python.Python.3.12`, then run the installer again. |
